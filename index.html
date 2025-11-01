@@ -192,6 +192,8 @@
         .completion-screen {
             text-align: center;
             padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
         }
 
         .completion-title {
@@ -233,6 +235,47 @@
         .flag-decoration {
             font-size: 1.5rem;
             margin: 0 10px;
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            animation: sparkle-fall 3s linear infinite;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+            animation: confetti-fall 4s linear infinite;
+        }
+
+        @keyframes sparkle-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100% + 200px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(50%) rotate(180deg) scale(0.8);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(calc(100% + 200px)) rotate(360deg) scale(0.6);
+                opacity: 0;
+            }
         }
 
         @media (max-width: 600px) {
@@ -288,7 +331,7 @@
     </div>
     <div class="input-area"><input type="text" class="typing-input" id="typingInput" placeholder="Type here..." autocomplete="off">
     </div>
-    <div class="feedback" id="feedback"></div><button class="next-button" id="nextButton" style="display: none;">Next Round</button>
+    <div class="feedback" id="feedback"></div>
    </div>
    <div class="completion-screen" id="completionScreen" style="display: none;">
     <h2 class="completion-title">🎉 Congratulations! 🎉</h2>
@@ -302,7 +345,7 @@
    </div>
   </div>
   <script>
-        // Game data structure
+        // Game data structure - 3 levels with 5 rounds each
         const gameData = {
             1: { // Level 1: One word
                 words: ['flag', 'hero', 'brave', 'honor', 'peace']
@@ -312,12 +355,6 @@
             },
             3: { // Level 3: Three words
                 words: ['thank our veterans', 'brave and strong', 'red white blue', 'honor our heroes', 'freedom is precious']
-            },
-            4: { // Level 4: Four words
-                words: ['thank you for service', 'brave heroes protect us', 'red white and blue', 'honor all our veterans', 'freedom comes with sacrifice']
-            },
-            5: { // Level 5: Simple sentences
-                words: ['Veterans are our heroes.', 'Thank you for your service.', 'Freedom is not free today.', 'We honor brave men and women.', 'Heroes keep our country safe.']
             }
         };
 
@@ -401,15 +438,14 @@
             document.getElementById('typingInput').value = '';
             document.getElementById('typingInput').focus();
             document.getElementById('feedback').textContent = '';
-            document.getElementById('nextButton').style.display = 'none';
         }
 
         function updateDisplay() {
             document.getElementById('levelBadge').textContent = `Level ${currentLevel}`;
             document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
             
-            const totalRounds = 25; // 5 levels × 5 rounds
-            const completedRounds = (currentLevel - 1) * 5 + (currentRound - 1);
+            const totalRounds = 15; // 3 levels × 5 rounds
+            const completedRounds = (currentLevel - 1) * 5 + currentRound;
             const progressPercent = (completedRounds / totalRounds) * 100;
             
             document.getElementById('progressFill').style.width = `${progressPercent}%`;
@@ -422,16 +458,16 @@
             
             if (userInput.toLowerCase() === currentWord.toLowerCase()) {
                 score += 10;
-                feedback.textContent = '✅ Correct! Great job!';
+                feedback.textContent = '✅ Correct! Press Enter to continue!';
                 feedback.className = 'feedback correct';
-                document.getElementById('nextButton').style.display = 'inline-block';
-                document.getElementById('typingInput').disabled = true;
+                document.getElementById('typingInput').dataset.correct = 'true';
                 
                 // Save progress
                 saveProgress();
             } else if (userInput.length > 0) {
                 feedback.textContent = '❌ Try again! Check your spelling.';
                 feedback.className = 'feedback incorrect';
+                document.getElementById('typingInput').dataset.correct = 'false';
             }
         }
 
@@ -454,7 +490,7 @@
         function nextRound() {
             if (currentRound < 5) {
                 currentRound++;
-            } else if (currentLevel < 5) {
+            } else if (currentLevel < 3) {
                 currentLevel++;
                 currentRound = 1;
             } else {
@@ -464,6 +500,7 @@
             }
             
             document.getElementById('typingInput').disabled = false;
+            document.getElementById('typingInput').dataset.correct = 'false';
             updateDisplay();
             loadCurrentWord();
         }
@@ -472,6 +509,71 @@
             document.getElementById('gameArea').style.display = 'none';
             document.getElementById('completionScreen').style.display = 'block';
             document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+            
+            // Start sparkle animation
+            createSparkles();
+        }
+
+        function createSparkles() {
+            const sparkleEmojis = ['✨', '⭐', '🎉', '💫', '🌟'];
+            const confettiColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8', '#f7dc6f'];
+            const completionScreen = document.getElementById('completionScreen');
+            
+            function addSparkle() {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                
+                completionScreen.appendChild(sparkle);
+                
+                // Remove sparkle after animation
+                setTimeout(() => {
+                    if (sparkle.parentNode) {
+                        sparkle.parentNode.removeChild(sparkle);
+                    }
+                }, 5000);
+            }
+            
+            function addConfetti() {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Create different confetti shapes
+                const shapes = ['●', '■', '▲', '♦', '★'];
+                confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+                confetti.style.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                confetti.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                
+                completionScreen.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 6000);
+            }
+            
+            // Create initial burst of sparkles and confetti
+            for (let i = 0; i < 15; i++) {
+                setTimeout(addSparkle, i * 100);
+                setTimeout(addConfetti, i * 150);
+            }
+            
+            // Continue adding sparkles and confetti
+            const sparkleInterval = setInterval(addSparkle, 300);
+            const confettiInterval = setInterval(addConfetti, 200);
+            
+            setTimeout(() => {
+                clearInterval(sparkleInterval);
+                clearInterval(confettiInterval);
+            }, 10000);
         }
 
         // Event listeners
@@ -479,18 +581,23 @@
         
         document.getElementById('typingInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                const nextBtn = document.getElementById('nextButton');
-                if (nextBtn.style.display !== 'none') {
+                const input = document.getElementById('typingInput');
+                if (input.dataset.correct === 'true') {
                     nextRound();
+                } else {
+                    // Check answer when Enter is pressed
+                    checkAnswer();
+                    if (input.dataset.correct === 'true') {
+                        nextRound();
+                    }
                 }
             }
         });
 
-        document.getElementById('nextButton').addEventListener('click', nextRound);
         document.getElementById('restartButton').addEventListener('click', startGame);
 
         // Initialize the app
         initializeApp();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'997c61d350d2e006',t:'MTc2MjAxMDQ4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'997c80731231e006',t:'MTc2MjAxMTc0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
