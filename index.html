@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veterans Day Typing Challenge</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #dc2626 50%, #ffffff 100%);
+            min-height: 100%;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 3px solid #dc2626;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-bottom: 20px;
+        }
+
+        .progress-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-badge {
+            background: #1e3a8a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score {
+            background: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3a8a, #dc2626);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 3px solid #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .target-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px dashed #dc2626;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        .typing-input {
+            font-size: 1.5rem;
+            padding: 15px;
+            border: 3px solid #1e3a8a;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+
+        .typing-input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        .feedback {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+            margin-bottom: 20px;
+        }
+
+        .correct {
+            color: #059669;
+        }
+
+        .incorrect {
+            color: #dc2626;
+        }
+
+        .stars {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        .next-button {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .next-button:hover {
+            background: #1e40af;
+        }
+
+        .next-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .completion-title {
+            font-size: 2.5rem;
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .completion-message {
+            font-size: 1.3rem;
+            color: #374151;
+            margin-bottom: 30px;
+        }
+
+        .final-score {
+            font-size: 2rem;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .restart-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .restart-button:hover {
+            background: #b91c1c;
+        }
+
+        .flag-decoration {
+            font-size: 1.5rem;
+            margin: 0 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .target-text {
+                font-size: 1.5rem;
+            }
+            
+            .typing-input {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <div class="header">
+    <h1 class="title" id="gameTitle">Veterans Day Typing Challenge</h1>
+    <p class="instructions" id="instructionsText">Type the words you see to honor our veterans!</p>
+    <div class="flag-decoration">
+     🇺🇸 ⭐ 🇺🇸
+    </div>
+   </div>
+   <div class="progress-section">
+    <div class="level-info">
+     <div class="level-badge" id="levelBadge">
+      Level 1
+     </div>
+     <div class="score" id="scoreDisplay">
+      Score: 0
+     </div>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="progress-text" id="progressText">
+     Round 1 of 5
+    </div>
+   </div>
+   <div class="game-area" id="gameArea">
+    <div class="target-text" id="targetText">
+     flag
+    </div>
+    <div class="input-area"><input type="text" class="typing-input" id="typingInput" placeholder="Type here..." autocomplete="off">
+    </div>
+    <div class="feedback" id="feedback"></div><button class="next-button" id="nextButton" style="display: none;">Next Round</button>
+   </div>
+   <div class="completion-screen" id="completionScreen" style="display: none;">
+    <h2 class="completion-title">🎉 Congratulations! 🎉</h2>
+    <p class="completion-message" id="completionMessage">Great job! You completed the Veterans Day challenge!</p>
+    <div class="final-score" id="finalScore">
+     Final Score: 0
+    </div>
+    <div class="stars">
+     ⭐ 🇺🇸 ⭐ 🇺🇸 ⭐
+    </div><button class="restart-button" id="restartButton">Play Again</button>
+   </div>
+  </div>
+  <script>
+        // Game data structure
+        const gameData = {
+            1: { // Level 1: One word
+                words: ['flag', 'hero', 'brave', 'honor', 'peace']
+            },
+            2: { // Level 2: Two words
+                words: ['thank you', 'brave hero', 'red white', 'honor guard', 'home safe']
+            },
+            3: { // Level 3: Three words
+                words: ['thank our veterans', 'brave and strong', 'red white blue', 'honor our heroes', 'freedom is precious']
+            },
+            4: { // Level 4: Four words
+                words: ['thank you for service', 'brave heroes protect us', 'red white and blue', 'honor all our veterans', 'freedom comes with sacrifice']
+            },
+            5: { // Level 5: Simple sentences
+                words: ['Veterans are our heroes.', 'Thank you for your service.', 'Freedom is not free today.', 'We honor brave men and women.', 'Heroes keep our country safe.']
+            }
+        };
+
+        // Game state
+        let currentLevel = 1;
+        let currentRound = 1;
+        let score = 0;
+        let currentWord = '';
+        let gameRecords = [];
+
+        // Default configuration
+        const defaultConfig = {
+            game_title: "Veterans Day Typing Challenge",
+            instructions_text: "Type the words you see to honor our veterans!",
+            completion_message: "Great job! You completed the Veterans Day challenge!"
+        };
+
+        // Data SDK handler
+        const dataHandler = {
+            onDataChanged(data) {
+                gameRecords = data;
+                // Update UI if needed based on stored records
+            }
+        };
+
+        // Element SDK configuration
+        const elementConfig = {
+            defaultConfig: defaultConfig,
+            onConfigChange: async (config) => {
+                const title = config.game_title || defaultConfig.game_title;
+                const instructions = config.instructions_text || defaultConfig.instructions_text;
+                const completion = config.completion_message || defaultConfig.completion_message;
+
+                document.getElementById('gameTitle').textContent = title;
+                document.getElementById('instructionsText').textContent = instructions;
+                document.getElementById('completionMessage').textContent = completion;
+            },
+            mapToCapabilities: (config) => ({
+                recolorables: [],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            }),
+            mapToEditPanelValues: (config) => new Map([
+                ["game_title", config.game_title || defaultConfig.game_title],
+                ["instructions_text", config.instructions_text || defaultConfig.instructions_text],
+                ["completion_message", config.completion_message || defaultConfig.completion_message]
+            ])
+        };
+
+        // Initialize SDKs
+        async function initializeApp() {
+            if (window.dataSdk) {
+                const initResult = await window.dataSdk.init(dataHandler);
+                if (!initResult.isOk) {
+                    console.error("Failed to initialize data SDK");
+                }
+            }
+
+            if (window.elementSdk) {
+                window.elementSdk.init(elementConfig);
+            }
+
+            startGame();
+        }
+
+        function startGame() {
+            currentLevel = 1;
+            currentRound = 1;
+            score = 0;
+            updateDisplay();
+            loadCurrentWord();
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('completionScreen').style.display = 'none';
+        }
+
+        function loadCurrentWord() {
+            const words = gameData[currentLevel].words;
+            currentWord = words[currentRound - 1];
+            document.getElementById('targetText').textContent = currentWord;
+            document.getElementById('typingInput').value = '';
+            document.getElementById('typingInput').focus();
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('nextButton').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            document.getElementById('levelBadge').textContent = `Level ${currentLevel}`;
+            document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+            
+            const totalRounds = 25; // 5 levels × 5 rounds
+            const completedRounds = (currentLevel - 1) * 5 + (currentRound - 1);
+            const progressPercent = (completedRounds / totalRounds) * 100;
+            
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            document.getElementById('progressText').textContent = `Level ${currentLevel} - Round ${currentRound} of 5`;
+        }
+
+        function checkAnswer() {
+            const userInput = document.getElementById('typingInput').value.trim();
+            const feedback = document.getElementById('feedback');
+            
+            if (userInput.toLowerCase() === currentWord.toLowerCase()) {
+                score += 10;
+                feedback.textContent = '✅ Correct! Great job!';
+                feedback.className = 'feedback correct';
+                document.getElementById('nextButton').style.display = 'inline-block';
+                document.getElementById('typingInput').disabled = true;
+                
+                // Save progress
+                saveProgress();
+            } else if (userInput.length > 0) {
+                feedback.textContent = '❌ Try again! Check your spelling.';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        async function saveProgress() {
+            if (window.dataSdk && gameRecords.length < 999) {
+                const progressRecord = {
+                    level: currentLevel,
+                    round: currentRound,
+                    score: score,
+                    completed_at: new Date().toISOString()
+                };
+
+                const result = await window.dataSdk.create(progressRecord);
+                if (!result.isOk) {
+                    console.error("Failed to save progress");
+                }
+            }
+        }
+
+        function nextRound() {
+            if (currentRound < 5) {
+                currentRound++;
+            } else if (currentLevel < 5) {
+                currentLevel++;
+                currentRound = 1;
+            } else {
+                // Game completed
+                showCompletionScreen();
+                return;
+            }
+            
+            document.getElementById('typingInput').disabled = false;
+            updateDisplay();
+            loadCurrentWord();
+        }
+
+        function showCompletionScreen() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('completionScreen').style.display = 'block';
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+        }
+
+        // Event listeners
+        document.getElementById('typingInput').addEventListener('input', checkAnswer);
+        
+        document.getElementById('typingInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const nextBtn = document.getElementById('nextButton');
+                if (nextBtn.style.display !== 'none') {
+                    nextRound();
+                }
+            }
+        });
+
+        document.getElementById('nextButton').addEventListener('click', nextRound);
+        document.getElementById('restartButton').addEventListener('click', startGame);
+
+        // Initialize the app
+        initializeApp();
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'997c61d350d2e006',t:'MTc2MjAxMDQ4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
